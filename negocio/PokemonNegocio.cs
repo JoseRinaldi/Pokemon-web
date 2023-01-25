@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using dominio;
+using System.Security.Cryptography;
 
 namespace negocio
 {
     public class PokemonNegocio
     {
-        public List<Pokemon> listar() 
+        public List<Pokemon> listar(string id = "") //asi deja el parametro vacio y lo podemos cargar despues mediante un querystring
         {
             List<Pokemon> lista = new List<Pokemon>();
 
@@ -23,7 +24,11 @@ namespace negocio
             {
                 conexion.ConnectionString = "server=.\\SQLEXPRESS; database=POKEDEX_DB; integrated security=true";
                 comando.CommandType = System.Data.CommandType.Text;
-                comando.CommandText = "select Numero, Nombre, P.Descripcion, UrlImagen, E.Descripcion as Tipo, D.Descripcion as Debilidad, P.IdTipo, P.IdDebilidad, P.Id from POKEMONS P, ELEMENTOS E, ELEMENTOS D where E.Id = P.IdTipo and D.Id = P.IdDebilidad and P.Activo = 1";
+                comando.CommandText = "select Numero, Nombre, P.Descripcion, UrlImagen, E.Descripcion as Tipo, D.Descripcion as Debilidad, P.IdTipo, P.IdDebilidad, P.Id from POKEMONS P, ELEMENTOS E, ELEMENTOS D where E.Id = P.IdTipo and D.Id = P.IdDebilidad and P.Activo = 1 ";
+                if (id != "")
+                {
+                    comando.CommandText += " and P.Id = " + id;
+                }
                 comando.Connection = conexion;
 
                 conexion.Open();
@@ -132,6 +137,35 @@ namespace negocio
             }
 
         
+        }
+
+        public void agregarconSP(Pokemon nuevo)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearProcedimiento("storedaltapokemons");
+                datos.setearParametros("@numero", nuevo.Numero);
+                datos.setearParametros("@nombre", nuevo.Nombre);
+                datos.setearParametros("@desc", nuevo.Descripcion);
+                datos.setearParametros("@img", nuevo.UrlImagen);
+                datos.setearParametros("@idTipo", nuevo.Tipo.Id);
+                datos.setearParametros("@idDebilidad", nuevo.Debilidad.Id);
+                //datos.setearParametros("@urlImagen", nuevo.UrlImagen);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+
+
         }
 
         public void modificar(Pokemon modificar) 
@@ -290,6 +324,33 @@ namespace negocio
             {
 
                 throw ex;
+            }
+        }
+
+        public void modificarconSP(Pokemon modificar)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearProcedimiento("storedmodificarpokemons");
+                datos.setearParametros("@numero", modificar.Numero);
+                datos.setearParametros("@nombre", modificar.Nombre);
+                datos.setearParametros("@desc", modificar.Descripcion);
+                datos.setearParametros("@img", modificar.UrlImagen);
+                datos.setearParametros("@IdTipo", modificar.Tipo.Id);
+                datos.setearParametros("@IdDebilidad", modificar.Debilidad.Id);
+                datos.setearParametros("@Id", modificar.Id);
+
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
             }
         }
     }
