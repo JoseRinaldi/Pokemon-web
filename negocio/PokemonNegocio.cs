@@ -236,28 +236,28 @@ namespace negocio
             }
         }
 
-        public List<Pokemon> filtrar(string campo, string criterio, string filtro)//filtro avanzado con condiciones se ejecuta esta opcion cuando se presiona el boton buscar//
+        public List<Pokemon> filtrar(string campo, string criterio, string filtro, string estado)//filtro avanzado con condiciones se ejecuta esta opcion cuando se presiona el boton buscar//
         {
             List<Pokemon> lista = new List<Pokemon>();
             AccesoDatos datos = new AccesoDatos();
 
             try//aqui se arma la consulta con las distintas opciones//
             {
-                string consulta = "select Numero, Nombre, P.Descripcion, UrlImagen, E.Descripcion as Tipo, D.Descripcion as Debilidad, P.IdTipo, P.IdDebilidad, P.Id from POKEMONS P, ELEMENTOS E, ELEMENTOS D where E.Id = P.IdTipo and D.Id = P.IdDebilidad and P.Activo = 1 and ";
-                if(campo == "Numero")
+                string consulta = "select Numero, Nombre, P.Descripcion, UrlImagen, E.Descripcion as Tipo, D.Descripcion as Debilidad, P.IdTipo, P.IdDebilidad, P.Id, P.Activo from POKEMONS P, ELEMENTOS E, ELEMENTOS D where E.Id = P.IdTipo and D.Id = P.IdDebilidad and ";
+                if(campo == "Número")
                 {
                     switch (criterio)
                     {
                         case "Mayor a":
-                            consulta += "Numero >" + filtro;
+                            consulta += "Numero > " + filtro;
                             break; 
                         
                         case "Menor a":
-                            consulta += "Numero >" + filtro;
+                            consulta += "Numero < " + filtro;
                             break;
                         
                         default:
-                            consulta += "Numero >" + filtro;
+                            consulta += "Numero = " + filtro;
                             break;
 
                     }
@@ -285,19 +285,24 @@ namespace negocio
                     switch (criterio)
                     {
                         case "Empieza con":
-                            consulta += "Nombre like '" + filtro + "%'";
+                            consulta += "E.Descripcion like '" + filtro + "%'";
                             break;
 
                         case "Termina con":
-                            consulta += "Nombre like '%" + filtro + "'";
+                            consulta += "E.Descripcion like '%" + filtro + "'";
                             break;
 
                         default:
-                            consulta += "Nombre like ´%" + filtro + "%'";
+                            consulta += "E.Descripcion like ´%" + filtro + "%'";
                             break;
 
                     }
                 }
+
+                if (estado == "Activo")
+                    consulta += " and P.Activo = 1";
+                else if (estado == "Inactivo")
+                    consulta += " and P.Activo = 0";
 
                 datos.setearConsulta(consulta); //aqui se genera la consulta a la base de datos//
                 datos.ejecutarLectura();
@@ -318,6 +323,8 @@ namespace negocio
                     aux.Debilidad = new Elemento();
                     aux.Debilidad.Id = (int)datos.Lector["IdDebilidad"];
                     aux.Debilidad.Descripcion = (string)datos.Lector["Debilidad"];
+
+                    aux.Activo = bool.Parse(datos.Lector["Activo"].ToString());
 
                     lista.Add(aux);
                 }
