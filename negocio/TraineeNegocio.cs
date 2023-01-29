@@ -14,8 +14,13 @@ namespace negocio
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("update USERS set imagenPerfil = @imagen where Id = @id");
-                datos.setearParametros("@imagen", user.ImagenPerfil);
+                datos.setearConsulta("update USERS set imagenPerfil = @imagen, nombre = @nombre, apellido = @apellido, fechaNacimiento = @fecha where Id = @id");
+                //datos.setearParametros("@imagen", user.ImagenPerfil != null? user.ImagenPerfil : (object)DBNull.Value); operador ternario cumple la misma funcion q el operador null coallesing
+                datos.setearParametros("@imagen", (object)user.ImagenPerfil ?? DBNull.Value);//operador null coallesing este permite evaluar la condicion y si es verdadera la manda
+                                                                                             //y si no manda el otro valor
+                datos.setearParametros("@nombre", user.Nombre);
+                datos.setearParametros("@apellido", user.Apellido);
+                datos.setearParametros("@fecha", user.FechaNacimiento);
                 datos.setearParametros("@id", user.Id);
                 datos.ejecutarAccion();
 
@@ -62,7 +67,7 @@ namespace negocio
 
             try
             {
-                datos.setearConsulta("select Id, Email, Pass, Admin, imagenPerfil from USERS where email = @email and pass = @pass ");
+                datos.setearConsulta("select Id, Email, Pass, Admin, imagenPerfil, nombre, apellido, fechaNacimiento from USERS where email = @email and pass = @pass ");
                 datos.setearParametros("@email", trainee.Email);
                 datos.setearParametros("@pass", trainee.Pass);
                 datos.ejecutarLectura();
@@ -72,9 +77,13 @@ namespace negocio
                     trainee.Id = (int)datos.Lector["Id"];
                     trainee.Admin = (bool)datos.Lector["Admin"];
                     if (!(datos.Lector["imagenPerfil"] is DBNull))
-
                         trainee.ImagenPerfil = (string)datos.Lector["imagenPerfil"];
-
+                    if (!(datos.Lector["nombre"] is DBNull))
+                        trainee.Nombre = (string)datos.Lector["nombre"];
+                    if (!(datos.Lector["apellido"] is DBNull))
+                        trainee.Apellido = (string)datos.Lector["apellido"];
+                    if (!(datos.Lector["fechaNacimiento"] is DBNull))
+                        trainee.FechaNacimiento = DateTime.Parse(datos.Lector["fechaNacimiento"].ToString());
                     return true;
                     
                 }
