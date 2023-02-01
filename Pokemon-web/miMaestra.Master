@@ -12,7 +12,7 @@
 </head>
 <body>
     <form id="form1" runat="server">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Pokémon Web</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,6 +22,24 @@
                     <div class="navbar-nav">
                         <a class="nav-link active" aria-current="page" href="Default.aspx">Home</a>
                         <a class="nav-link" href="Lista.aspx">Lista de Pokemons</a>
+                        <a class="nav-link" href="Favoritos.aspx">Favoritos</a>
+                        <a class="nav-link" href="MiPerfil.aspx">Mi Perfil</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="container-fluid justify-content-start">
+                        <%if (!negocio.Seguridad.sesionActiva(Session["Trainee"]))
+                            {%>
+                                <asp:Button Text="Login" id="btnLogin" OnClick="btnLogin_Click" CssClass="btn btn-outline-success me-2" runat="server" />
+                                <asp:Button id="btnRegistrar" Text="Registrate" OnClick="btnRegistrar_Click" CssClass="btn btn-outline-primary" runat="server" />
+                           <%}
+                               else{ %>
+                                <asp:Button id="btnSalir" Text="Salir" OnClick="btnSalir_Click" CssClass="btn btn-outline-danger" runat="server" />
+                                <asp:Label Text="user" ID="lblUser" CssClass="text-light m-auto me-2" runat="server" />
+                        <%} %>
+
+
+                        <asp:Image  ID="imgAvatar" Style="height:40px; width:40px; border-radius:50%" runat="server" />
                     </div>
                 </div>
             </div>
